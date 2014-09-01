@@ -1,0 +1,9 @@
+CREATE TABLE `people` (
+	`id` MEDIUMINT(9) NOT NULL AUTO_INCREMENT,
+	`name` TEXT NOT NULL,
+	`age` INT(11) NOT NULL,
+	PRIMARY KEY (`id`)
+)
+COLLATE='utf8_general_ci'
+ENGINE=InnoDB
+AUTO_INCREMENT=44;
