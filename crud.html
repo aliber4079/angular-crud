@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html><head>
+ <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+ <style>
+  th {
+   background: #e0e0e0;
+   width: 20em;
+  }
+  tr:nth-child(odd) input {
+   background: #e0e0e0;
+   width: 100%;
+  }
+  tr:nth-child(even) input {
+   background: white;
+   width: 100%;
+  }
+  input {
+    border: none;
+  }
+  input.editing {
+   border: solid thin black;
+  }
+  div[ng-app] {
+   margin: 5em;
+  }
+  </style>
+</head>
+<body>
+
+<div ng-app="crud" ng-controller="InplaceEditController as myCtrl">
+  <table>
+   <tr>
+    <th ng-repeat="field in fields">{{field.name}}</th>
+	<th colspan="2">edit</th>
+	
+   </tr>
+   <tr  ng-repeat="person in people" ng-form="editUserForm">
+    <td ng-repeat="field in fields"  >
+	 <input dyn-name="{{field.name}}"   ng-disabled="!person.editing" ng-class="{editing:person.editing}"  ng-model="person[field.name]" ng-required="{{field.required}}" type="{{field.type}}" min="{{field.min}}" max="{{field.max}}"/>
+	</td>
+    <td>
+	 <span ng-hide="person.editing">
+	  <button type="button" ng-click="edit(person)"><span class="glyphicon glyphicon-pencil"></span></button>
+	  <button type="button" ng-click="delete(person)"><span class="glyphicon glyphicon-remove"></span></button>
+	 </span>
+	 <span ng-show="person.editing">
+	  <button type="button" ng-click="formsubmit(person)">save</button>
+	  <button type="button" ng-click="reset(person)">cancel</button>
+	 </span>
+	 </td>
+	 <td >
+	 <div ng-repeat="field in fields" style="color:red;" ng-show="editUserForm[field['name']].$error.required">{{field.name}} is required.</div>
+	 <div ng-repeat="field in fields" style="color:red;" ng-show="editUserForm[field['name']].$error.number">{{field.name}} takes a numeric value.</div>
+	 <div ng-repeat="field in fields" style="color:red;" ng-show="editUserForm[field['name']].$error.min">{{field.name}} must be at least {{field.min}}.</div>
+	 <div ng-repeat="field in fields" style="color:red;" ng-show="editUserForm[field['name']].$error.max">{{field.name}} must be less than {{field.max}}.</div>
+	</td>
+   </tr>
+  </table>
+  <div  ng-hide="addinguser == true">
+   <button type="button" ng-click="addinguser=true;newperson={editing:true,new:true}; people.push(newperson); errormsg=''">
+    <span class="glyphicon glyphicon-plus"></span>Add user
+   </button>
+  </div>
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.0/angular.min.js"></script>
+<script>
+ (function (){
+  angular.module('crud',[])
+  .controller('InplaceEditController',function($scope,$http,$filter){
+   $scope.master={};
+   $scope.fields=[{name:'name',type:'string',required:true},{name:'age',type:'number',required:true,min:1}];
+   $scope.reset=function(person){
+    if(person.new==true) {
+	 $scope.people.pop();
+	 $scope.addinguser=false;
+	 return;
+	};
+    angular.copy($scope.master,person);
+	person.editing=false;
+   };
+   $scope.edit = function(person){
+    angular.copy(person,$scope.master);
+	person.editing=true;
+   };
+   $scope.formsubmit = function(person) {
+    action = (person.new==true ? 'addperson' : 'updateperson' );
+    $http.post('/aj/q.php?'+action,person).success(function(p){
+	 console.log($filter('json')(p));
+	 person.editing=false;
+	 person.id=p.id;
+	 $scope.addinguser=false;
+	})
+	.error(function(e){console.log('oops, ' + e.err);});
+   };
+   $scope.delete=function(person){
+	 $http.post('/aj/q.php?deleteperson',person).success(function(p){
+	 console.log($filter('json')($scope.people));
+	 console.log("deleting index " + p);
+	 for (i in $scope.people) {
+	  if ($scope.people[i].id==p) {
+	   $scope.people.splice(i,1);
+	   break;
+	  }
+	 }
+	})
+	.error(function(e){console.log('oops, ' + e.err);});
+   }
+   $http.get('/aj/q.php').success(function(e){
+     console.log(e);
+     $scope.people=[];
+     $scope.people=e;
+	 console.log($scope.people);
+	});
+  })
+  .directive('dynName',function() {
+    return {
+     require : ['ngModel', '^form'],
+	 link : function(scope,element,attr,ctrls) {
+	  ctrls[0].$name = attr.dynName;
+	  ctrls[1].$addControl(ctrls[0]);
+	 }
+	}
+   });
+  ;})();
+</script>
+</body>
+</html>
