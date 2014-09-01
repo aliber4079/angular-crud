@@ -87,7 +87,7 @@
    };
    $scope.formsubmit = function(person) {
     action = (person.new==true ? 'addperson' : 'updateperson' );
-    $http.post('/aj/q.php?'+action,person).success(function(p){
+    $http.post('/angular-crud/serverside.php?'+action,person).success(function(p){
      console.log($filter('json')(p));
      person.editing=false;
      person.id=p.id;
@@ -96,7 +96,7 @@
     .error(function(e){console.log('oops, ' + e.err);});
    };
    $scope.delete=function(person){
-     $http.post('/aj/q.php?deleteperson',person).success(function(p){
+     $http.post('/angular-crud/serverside.php?deleteperson',person).success(function(p){
      console.log($filter('json')($scope.people));
      console.log("deleting index " + p);
      for (i in $scope.people) {
@@ -108,7 +108,7 @@
     })
     .error(function(e){console.log('oops, ' + e.err);});
    }
-   $http.get('/aj/q.php').success(function(e){
+   $http.get('/angular-crud/serverside.php').success(function(e){
      console.log(e);
      $scope.people=[];
      $scope.people=e;
