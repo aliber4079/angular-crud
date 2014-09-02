@@ -23,47 +23,50 @@
   div[ng-app] {
    margin: 5em;
   }
+  .statuscol {
+   color: red;
+  }
   </style>
 </head>
 <body>
 
 <div ng-app="crud" ng-controller="InplaceEditController as myCtrl">
-  <table>
-   <tr>
-    <th ng-repeat="field in fields">{{field.name}}</th>
-    <th colspan="2">edit</th>
+ <table>
+  <tr>
+   <th ng-repeat="field in fields">{{field.name}}</th>
+   <th colspan="2">edit</th>
     
-   </tr>
-   <tr  ng-repeat="person in people" ng-form="editUserForm">
-    <td ng-repeat="field in fields"  >
-     <input dyn-name="{{field.name}}"   ng-disabled="!person.editing" ng-class="{editing:person.editing}"
+  </tr>
+  <tr  ng-repeat="person in people" ng-form="editUserForm">
+   <td ng-repeat="field in fields"  >
+    <input dyn-name="{{field.name}}"   ng-disabled="!person.editing" ng-class="{editing:person.editing}"
      ng-model="person[field.name]" ng-required="{{field.required}}" type="{{field.type}}" min="{{field.min}}"
      max="{{field.max}}"/>
-    </td>
-    <td>
-     <span ng-hide="person.editing">
-      <button type="button" ng-click="edit(person)"><span class="glyphicon glyphicon-pencil"></span></button>
-      <button type="button" ng-click="delete(person)"><span class="glyphicon glyphicon-remove"></span></button>
-     </span>
-     <span ng-show="person.editing">
-      <button type="button" ng-click="formsubmit(person)">save</button>
-      <button type="button" ng-click="reset(person)">cancel</button>
-     </span>
-     </td>
-     <td>
-     <div ng-repeat="field in fields" style="color:red;" ng-show="editUserForm[field['name']].$error.required">{{field.name}} is required.</div>
-     <div ng-repeat="field in fields" style="color:red;" ng-show="editUserForm[field['name']].$error.number">{{field.name}} takes a numeric value.</div>
-     <div ng-repeat="field in fields" style="color:red;" ng-show="editUserForm[field['name']].$error.min">{{field.name}} must be at least {{field.min}}.</div>
-     <div ng-repeat="field in fields" style="color:red;" ng-show="editUserForm[field['name']].$error.max">{{field.name}} must be less than {{field.max}}.</div>
-	 <div ><style="color:red;"  ng-bind="person.status"></div>
-    </td>
-   </tr>
-  </table>
-  <div  ng-hide="addinguser == true">
-   <button type="button" ng-click="addinguser=true;newperson={editing:true,new:true}; people.push(newperson); ">
-    <span class="glyphicon glyphicon-plus"></span>Add user
-   </button>
-  </div>
+   </td>
+   <td>
+    <span ng-hide="person.editing">
+     <button type="button" ng-click="edit(person)"><span class="glyphicon glyphicon-pencil"></span></button>
+     <button type="button" ng-click="delete(person)"><span class="glyphicon glyphicon-remove"></span></button>
+    </span>
+    <span ng-show="person.editing">
+     <button type="button" ng-click="formsubmit(person)">save</button>
+     <button type="button" ng-click="reset(person)">cancel</button>
+    </span>
+   </td>
+   <td class="statuscol">
+    <div ng-repeat="field in fields" ng-show="editUserForm[field['name']].$error.required">{{field.name}} is required.</div>
+    <div ng-repeat="field in fields" ng-show="editUserForm[field['name']].$error.number">{{field.name}} takes a numeric value.</div>
+    <div ng-repeat="field in fields" ng-show="editUserForm[field['name']].$error.min">{{field.name}} must be at least {{field.min}}.</div>
+    <div ng-repeat="field in fields" ng-show="editUserForm[field['name']].$error.max">{{field.name}} must be less than {{field.max}}.</div>
+	<div ><style="color:red;"  ng-bind="person.status" style="overflow:auto;"></div>
+   </td>
+  </tr>
+ </table>
+ <div  ng-hide="addinguser == true">
+  <button type="button" ng-click="addinguser=true;newperson={editing:true,new:true}; people.push(newperson); ">
+   <span class="glyphicon glyphicon-plus"></span>Add user
+  </button>
+ </div>
 </div>
 
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.0/angular.min.js"></script>
