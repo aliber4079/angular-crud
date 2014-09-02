@@ -58,7 +58,7 @@
     <div ng-repeat="field in fields" ng-show="editUserForm[field['name']].$error.number">{{field.name}} takes a numeric value.</div>
     <div ng-repeat="field in fields" ng-show="editUserForm[field['name']].$error.min">{{field.name}} must be at least {{field.min}}.</div>
     <div ng-repeat="field in fields" ng-show="editUserForm[field['name']].$error.max">{{field.name}} must be less than {{field.max}}.</div>
-	<div ><style="color:red;"  ng-bind="person.status" style="overflow:auto;"></div>
+    <div ><style="color:red;"  ng-bind="person.status" style="overflow:auto;"></div>
    </td>
   </tr>
  </table>
