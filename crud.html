@@ -55,11 +55,12 @@
      <div ng-repeat="field in fields" style="color:red;" ng-show="editUserForm[field['name']].$error.number">{{field.name}} takes a numeric value.</div>
      <div ng-repeat="field in fields" style="color:red;" ng-show="editUserForm[field['name']].$error.min">{{field.name}} must be at least {{field.min}}.</div>
      <div ng-repeat="field in fields" style="color:red;" ng-show="editUserForm[field['name']].$error.max">{{field.name}} must be less than {{field.max}}.</div>
+	 <div ><style="color:red;"  ng-bind="person.status"></div>
     </td>
    </tr>
   </table>
   <div  ng-hide="addinguser == true">
-   <button type="button" ng-click="addinguser=true;newperson={editing:true,new:true}; people.push(newperson); errormsg=''">
+   <button type="button" ng-click="addinguser=true;newperson={editing:true,new:true}; people.push(newperson); ">
     <span class="glyphicon glyphicon-plus"></span>Add user
    </button>
   </div>
@@ -72,7 +73,10 @@
   .controller('InplaceEditController',function($scope,$http,$filter){
    $scope.master={};
    $scope.fields=[{name:'name',type:'string',required:true},{name:'age',type:'number',required:true,min:1}];
+   
+   /****RESET*****/
    $scope.reset=function(person){
+    person.status="";
     if(person.new==true) {
      $scope.people.pop();
      $scope.addinguser=false;
@@ -81,11 +85,16 @@
     angular.copy($scope.master,person);
     person.editing=false;
    };
-   $scope.edit = function(person){
+   
+   /****EDIT*****/
+   $scope.edit = function(person){ 
     angular.copy(person,$scope.master);
     person.editing=true;
    };
-   $scope.formsubmit = function(person) {
+   
+   /*****SUBMIT*****/
+   $scope.formsubmit = function(person) { 
+	person.status="";
     action = (person.new==true ? 'addperson' : 'updateperson' );
     $http.post('/angular-crud/serverside.php?'+action,person).success(function(p){
      console.log($filter('json')(p));
@@ -93,9 +102,12 @@
      person.id=p.id;
      $scope.addinguser=false;
     })
-    .error(function(e){console.log('oops, ' + e.err);});
+    .error(function(e){person.status=e.err;});
    };
-   $scope.delete=function(person){
+   
+   /*****DELETE*****/
+   $scope.delete=function(person){ 
+	 person.status="";
      $http.post('/angular-crud/serverside.php?deleteperson',person).success(function(p){
      console.log($filter('json')($scope.people));
      console.log("deleting index " + p);
@@ -106,8 +118,10 @@
       }
      }
     })
-    .error(function(e){console.log('oops, ' + e.err);});
+    .error(function(e){person.status=e.err;});
    }
+   
+   /*****GET*****/
    $http.get('/angular-crud/serverside.php').success(function(e){
      console.log(e);
      $scope.people=[];
