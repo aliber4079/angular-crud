@@ -54,11 +54,10 @@
     </span>
    </td>
    <td class="statuscol">
-    <div ng-repeat="field in fields" ng-show="editUserForm[field['name']].$error.required">{{field.name}} is required.</div>
-    <div ng-repeat="field in fields" ng-show="editUserForm[field['name']].$error.number">{{field.name}} takes a numeric value.</div>
-    <div ng-repeat="field in fields" ng-show="editUserForm[field['name']].$error.min">{{field.name}} must be at least {{field.min}}.</div>
-    <div ng-repeat="field in fields" ng-show="editUserForm[field['name']].$error.max">{{field.name}} must be less than {{field.max}}.</div>
-    <div ><style="color:red;"  ng-bind="person.status" style="overflow:auto;"></div>
+    <div ng-repeat="validation in validations">
+     <div my-validate="{{validation.msg}}" ng-repeat="field in fields" ng-show="editUserForm[field['name']].$error.{{validation.type}}"  ></div>
+    </div>
+    <div ng-bind="person.status"></div>
    </td>
   </tr>
  </table>
@@ -73,21 +72,29 @@
 <script>
  (function (){
   angular.module('crud',[])
-  .controller('InplaceEditController',function($scope,$http,$filter){
+  .controller('InplaceEditController',function($scope,$http,$filter,$compile){
+
+   /*****INIT VARIABLES*****/
    $scope.master={};
    $scope.fields=[{name:'name',type:'string',required:true},{name:'age',type:'number',required:true,min:1}];
-   
+   $scope.validations=[
+    {type:'required',msg:'{{field.name}} is required'},
+    {type:'number',msg:'{{field.name}} takes a numeric value'},
+    {type:'min',msg:'{{field.name}} must be at least {{field.min}}'},
+    {type:'max',msg:'{{field.name}} must be less than {{field.max}}'}
+   ];
+    
    /****RESET*****/
    $scope.reset=function(person){
-    person.status="";
-    if(person.new==true) {
-     $scope.people.pop();
-     $scope.addinguser=false;
-     return;
-    };
-    angular.copy($scope.master,person);
-    person.editing=false;
+   person.status="";
+   if(person.new==true) {
+    $scope.people.pop();
+    $scope.addinguser=false;
+    return;
    };
+   angular.copy($scope.master,person);
+   person.editing=false;
+  };
    
    /****EDIT*****/
    $scope.edit = function(person){ 
@@ -132,15 +139,27 @@
      console.log($scope.people);
     });
   })
+  
+  /*****ALLOW DYNAMIC FORMS*****/
   .directive('dynName',function() {
-    return {
+   return {
      require : ['ngModel', '^form'],
      link : function(scope,element,attr,ctrls) {
       ctrls[0].$name = attr.dynName;
       ctrls[1].$addControl(ctrls[0]);
      }
     }
-   });
+   })
+   
+   /*****GENERALIZE VALIDATION MESSAGE*****/
+  .directive('myValidate',function($compile) {
+   return {
+    link: function(scope,element,attr){
+     element.text(attr.myValidate);
+     $compile(element.contents())(scope);
+    }
+   };
+  });
   ;})();
 </script>
 </body>
