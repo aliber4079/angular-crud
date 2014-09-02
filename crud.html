@@ -108,7 +108,7 @@
     action = (person.new==true ? 'addperson' : 'updateperson' );
     $http.post('/angular-crud/serverside.php?'+action,person).success(function(p){
      console.log($filter('json')(p));
-     person.editing=false;
+     person.editing=person.new=false;
      person.id=p.id;
      $scope.addinguser=false;
     })
