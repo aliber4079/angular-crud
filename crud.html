@@ -4,7 +4,10 @@
  <style>
   th {
    background: #e0e0e0;
-   width: 20em;
+   width: 15em;
+  }
+  .editcol {
+   width:10em
   }
   tr:nth-child(odd) input {
    background: #e0e0e0;
@@ -41,9 +44,9 @@
    <td ng-repeat="field in fields"  >
     <input dyn-name="{{field.name}}"   ng-disabled="!person.editing" ng-class="{editing:person.editing}"
      ng-model="person[field.name]" ng-required="{{field.required}}" type="{{field.type}}" min="{{field.min}}"
-     max="{{field.max}}"/>
+     max="{{field.max}}"  />
    </td>
-   <td>
+   <td class="editcol">
     <span ng-hide="person.editing">
      <button type="button" ng-click="edit(person)"><span class="glyphicon glyphicon-pencil"></span></button>
      <button type="button" ng-click="delete(person)"><span class="glyphicon glyphicon-remove"></span></button>
