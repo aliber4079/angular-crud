@@ -2,6 +2,9 @@
 <html><head>
  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
  <style>
+  .loading::after {
+    content: url(spinner.gif) ;
+  }
   th {
    background: #e0e0e0;
    width: 15em;
@@ -33,7 +36,7 @@
 </head>
 <body>
 
-<div ng-app="crud" ng-controller="InplaceEditController as myCtrl">
+<div  ng-app="crud" ng-controller="InplaceEditController as myCtrl" ng-class="{loading:loading}" >
  <table>
   <tr>
    <th ng-repeat="field in fields">{{field.name}}</th>
@@ -64,7 +67,7 @@
    </td>
   </tr>
  </table>
- <div  ng-hide="addinguser == true">
+ <div  ng-hide="addinguser || loading">
   <button type="button" ng-click="addinguser=true;newperson={editing:true,new:true}; people.push(newperson); ">
    <span class="glyphicon glyphicon-plus"></span>Add user
   </button>
@@ -86,7 +89,7 @@
     {type:'min',msg:'{{field.name}} must be at least {{field.min}}'},
     {type:'max',msg:'{{field.name}} must be less than {{field.max}}'}
    ];
-    
+
    /****RESET*****/
    $scope.reset=function(person){
    person.status="";
@@ -95,13 +98,21 @@
     $scope.addinguser=false;
     return;
    };
-   angular.copy($scope.master,person);
+   //restore old values
+   for (field in $scope.fields) {
+    person[$scope.fields[field].name]=person.save[$scope.fields[field].name];
+   }
+   person.save=null;
    person.editing=false;
   };
    
    /****EDIT*****/
-   $scope.edit = function(person){ 
-    angular.copy(person,$scope.master);
+   $scope.edit = function(person){
+    person.save={};
+    //save old values
+    for (field in $scope.fields) {
+     person.save[$scope.fields[field].name]=person[$scope.fields[field].name];
+    }
     person.editing=true;
    };
    
@@ -135,10 +146,12 @@
    }
    
    /*****GET*****/
+   $scope.loading=true;
    $http.get('/angular-crud/serverside.php').success(function(e){
      console.log(e);
      $scope.people=[];
      $scope.people=e;
+     $scope.loading=false;
      console.log($scope.people);
     });
   })
