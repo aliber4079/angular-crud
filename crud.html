@@ -2,9 +2,30 @@
 <html><head>
  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
  <style>
-  .loading::after {
-    content: url(spinner.gif) ;
-  }
+  .loading {
+        position: relative;
+        top: 0;
+        left: 0;
+        height: 128px;
+        width: 128px;
+         
+        -webkit-mask-image: url(spinner.png);
+        background-color: #000;
+        -webkit-animation-name: spinnerRotate;
+        -webkit-animation-duration: 2s;
+        -webkit-animation-iteration-count: infinite;
+        -webkit-animation-timing-function: linear;
+       }
+ 
+       @-webkit-keyframes spinnerRotate {
+        from {
+                -webkit-transform:rotate(0deg);
+        }
+        to {
+                -webkit-transform:rotate(360deg);
+        }
+      }
+
   th {
    background: #e0e0e0;
    width: 15em;
@@ -36,7 +57,7 @@
 </head>
 <body>
 
-<div  ng-app="crud" ng-controller="InplaceEditController as myCtrl" ng-class="{loading:loading}" >
+<div  ng-app="crud" ng-controller="InplaceEditController as myCtrl"  >
  <table>
   <tr>
    <th ng-repeat="field in fields">{{field.name}}</th>
@@ -72,6 +93,7 @@
    <span class="glyphicon glyphicon-plus"></span>Add user
   </button>
  </div>
+ <div ng-class="{loading:loading}"></div>
 </div>
 
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.0/angular.min.js"></script>
